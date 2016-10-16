@@ -1,0 +1,28 @@
+{
+  "name": "3rdFloorJukebox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "scripts": {
+    "transpile-dev": "eslint src/ && babel-node src/app.js",
+    "dev": "nodemon --watch src --exec npm run transpile-dev",
+    "transpile-debug": "eslint src/ && babel src -d dist -s",
+    "debug": "npm run transpile-debug && node-debug -c true --web-host localhost --hidden=node_modules ./dist/app.js",
+    "build": "rimraf dist && babel src -d dist"
+  },
+  "keywords": [],
+  "author": "Kaj Brand",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "eslint": "^3.8.0",
+    "nodemon": "^1.11.0",
+    "rimraf": "^2.5.4"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "es6-enum": "^1.1.0",
+    "express": "^4.14.0"
+  }
+}

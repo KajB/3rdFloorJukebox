@@ -1,0 +1,34 @@
+import Express from 'express';
+import BodyParser from 'body-parser';
+
+import Utils from './utils';
+import { SlashCommand } from './slack';
+
+const port = process.env.port || 3030;
+
+let router = Express.Router();
+
+router.use((req, res, next) => {
+    console.log(`A ${req.method} request!!`);
+    next();
+});
+
+router.route('/')
+    .get((req, res) => {
+        res.json({ message: 'GET is OK!!', request: Utils.cyclicObjectToJson(req) });
+    })
+    .post((req, res) => {
+        let slashCommand = new SlashCommand(req.body);
+
+        let commandResult = slashCommand.getResult();
+
+        res.status(commandResult.status).json(commandResult.data);
+    });
+
+let app = Express();
+
+app.use(BodyParser.json());
+app.use(BodyParser.urlencoded({ extended: true }));
+app.use('/api', router);
+
+app.listen(port);

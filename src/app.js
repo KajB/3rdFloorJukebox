@@ -1,7 +1,7 @@
 import Express from 'express';
 import BodyParser from 'body-parser';
 
-import Utils from './utils';
+import { cyclicObjectToJson } from './utils';
 import { SlashCommand } from './slack';
 
 const port = process.env.port || 3030;
@@ -15,7 +15,7 @@ router.use((req, res, next) => {
 
 router.route('/')
     .get((req, res) => {
-        res.json({ message: 'GET is OK!!', request: Utils.cyclicObjectToJson(req) });
+        res.json({ message: 'GET is OK!', request: cyclicObjectToJson(req) });
     })
     .post((req, res) => {
         let slashCommand = new SlashCommand(req.body);

@@ -1,4 +1,4 @@
-let cyclicStringify = (obj) => {
+export function cyclicStringify(obj) {
     let seen = [];
     return JSON.stringify(obj, function(key, val) {
         if (val != null && typeof val == 'object') {
@@ -9,12 +9,17 @@ let cyclicStringify = (obj) => {
         }
         return val;
     });
-};
-let cyclicObjectToJson = (obj) => {
+}
+export function cyclicObjectToJson(obj) {
     return JSON.parse(cyclicStringify(obj));
-};
+}
+export function Enum(a) {
+    let i = Object
+      .keys(a)
+      .reduce((o,k)=>(o[a[k]]=k,o),{});
 
-export default {
-    cyclicStringify,
-    cyclicObjectToJson
-};
+    return Object.freeze(
+      Object.keys(a)
+            .reduce((o,k)=>(o[k]=a[k],o), v=>i[v])
+        );
+}

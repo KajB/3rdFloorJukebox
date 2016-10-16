@@ -1,3 +1,6 @@
-import Enum from 'es6-enum';
+import { Enum }  from '../utils';
 
-export default Enum('EPHEMERAL', 'IN_CHANNEL');
+export default Enum({
+    EPHEMERAL: 'ephemeral',
+    IN_CHANNEL: 'in_channel'
+});

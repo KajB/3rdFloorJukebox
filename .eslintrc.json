@@ -17,6 +17,9 @@
         "no-empty": [
             1
         ],
+        "no-extra-semi": [
+            1
+        ],
         "indent": [
             "error",
             4

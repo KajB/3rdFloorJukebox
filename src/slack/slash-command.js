@@ -1,7 +1,7 @@
-import { config as Config } from '../config';
-import commands from '../commands';
+import Config from '../config';
+import Commands from '../commands';
 
-import { Response } from './response';
+import Response from './response';
 
 class SlashCommand {
     constructor(data) {
@@ -18,12 +18,13 @@ class SlashCommand {
     }
 
     getResult() {
-        if (!this.token ||
-            this.token !== Config.SLACK_TOKEN ||
-            !this.command ||
-            this.command !== Config.SLACK_COMMAND) {
+        if (this.isInvalid()) {
             return new Response(400);
         }
+    }
+
+    isInvalid() {
+        return !this.token || this.token !== Config.SLACK_TOKEN || !this.command || this.command !== Config.SLACK_COMMAND;
     }
 }
 

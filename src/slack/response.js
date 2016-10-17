@@ -1,4 +1,4 @@
-class Response {
+export default class Response {
     constructor(statuscode, message) {
         return {
             status: statuscode,
@@ -6,5 +6,3 @@ class Response {
         };
     }
 }
-
-export default Response;

@@ -1,5 +1,5 @@
 import { getCommands } from '../utils';
 
-import { c } from './controls';
+import Controls from './controls';
 
-export default getCommands(c);
+export default getCommands(new Controls());

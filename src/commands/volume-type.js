@@ -1,4 +1,4 @@
-import { Enum } from '../../utils';
+import { Enum } from '../utils';
 
 export default Enum({
     UP: '+',

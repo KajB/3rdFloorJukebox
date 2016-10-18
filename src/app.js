@@ -20,9 +20,11 @@ router.route('/')
     .post((req, res) => {
         let slashCommand = new SlashCommand(req.body);
 
-        let commandResult = slashCommand.getResult();
-
-        res.status(commandResult.status).json(commandResult.data);
+        let commandPromise = slashCommand.getResult();
+        
+        commandPromise.done((commandResult) => {
+            res.status(commandResult.status).json(commandResult.data);
+        });
     });
 
 let app = Express();

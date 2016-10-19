@@ -34,3 +34,9 @@ export function Enum(a) {
 
     return Object.freeze(Object.keys(a).reduce((o,k) => (o[k] = a[k], o), v => i[v]));
 }
+export function isHex(str) {
+    return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(str);
+}
+export function isUrl(str) {
+    return new RegExp('@^(https?|ftp)://[^\s/$.?#].[^\s]*$@iS').test(str);
+}

@@ -23,6 +23,7 @@ class SlashCommand {
         this.commandParameters = this.text.split(' ').slice(1);
     }
 
+
     getResult() {
         if (this.isInvalid()) {
             return Mopidy.when(new Response(400));
@@ -34,12 +35,12 @@ class SlashCommand {
 
         let command = Commands.get(this.command);
         return command(this.commandParameters)
-        .then((commandResult) => {
-            return new FormattedResponse(commandResult);
-        })
-        .catch((errorResult) => {
-            return new Response(400, errorResult);
-        });
+            .then((commandResult) => {
+                return new FormattedResponse(commandResult);
+            })
+            .catch((errorResult) => {
+                return new Response(400, errorResult);
+            });
     }
 
     /// When your server receives the above data,

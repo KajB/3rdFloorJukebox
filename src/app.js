@@ -21,7 +21,7 @@ router.route('/')
         let slashCommand = new SlashCommand(req.body);
 
         let commandPromise = slashCommand.getResult();
-        
+
         commandPromise.done((commandResult) => {
             res.status(commandResult.status).json(commandResult.data);
         });

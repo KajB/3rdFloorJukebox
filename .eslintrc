@@ -29,12 +29,12 @@
             "windows"
         ],
         "quotes": [
-            "error",
+            "warn",
             "single",
              { "allowTemplateLiterals": true }
         ],
         "semi": [
-            "error",
+            "warn",
             "always"
         ]
     }

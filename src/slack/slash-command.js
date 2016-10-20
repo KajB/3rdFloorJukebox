@@ -1,7 +1,6 @@
-import Mopidy from 'mopidy';
-
 import Config from '../config';
 import Commands from '../commands';
+import { Mopidy } from '../mopidy';
 
 import Response from './response';
 import FormattedResponse from './formatted-response';
@@ -23,14 +22,13 @@ class SlashCommand {
         this.commandParameters = this.text.split(' ').slice(1);
     }
 
-
     getResult() {
         if (this.isInvalid()) {
             return Mopidy.when(new Response(400));
         }
 
         if (!Commands.has(this.command)) {
-            return Mopidy.when(new Response(200, 'The command is not known or currently implemented.'));
+            return Mopidy.when(new Response(200, 'That command is not known or currently implemented.'));
         }
 
         let command = Commands.get(this.command);

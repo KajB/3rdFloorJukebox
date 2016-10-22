@@ -31,10 +31,14 @@ class SlashCommand {
             return Mopidy.when(new Response(200, 'That command is not known or currently implemented.'));
         }
 
-        let command = Commands.get(this.command);
-        return command(this.commandParameters)
+        let command = this.needsHelp() ? Commands.get('help')
+                                       : Commands.get(this.command);
+        let commandParameters = this.needsHelp() ? Commands.get(this.command)
+                                                 : this.commandParameters;
+
+        return command.run(commandParameters)
             .then((commandResult) => {
-                return new FormattedResponse(commandResult);
+                return commandResult;
             })
             .catch((errorResult) => {
                 return new Response(400, errorResult);
@@ -47,6 +51,10 @@ class SlashCommand {
     /// If the token or team are unknown to your application, you should refuse to service the request and return an error instead.
     isInvalid() {
         return !this.token || this.token !== Config.SLACK_TOKEN || !this.slackCommand || this.slackCommand !== Config.SLACK_COMMAND;
+    }
+
+    needsHelp() {
+        return (this.commandParameters.includes('-h') || this.commandParameters.includes('--help'));
     }
 }
 

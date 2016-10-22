@@ -1,3 +1,21 @@
+export class InternalCommand {
+    constructor(method, file) {
+        this.method = method;
+        this._residesIn = file;
+    }
+
+    get residesIn() {
+        return this._residesIn.toLowerCase();
+    }
+
+    set residesIn(file){
+        this._residesIn = file;
+    }
+
+    run(params) {
+        return this.method(params);
+    }
+}
 export function getCommands(...commandClasses) {
     let commands = new Map();
 
@@ -8,7 +26,7 @@ export function getCommands(...commandClasses) {
                 continue;
             }
 
-            commands.set(command, method);
+            commands.set(command, new InternalCommand(method, commandClass.constructor.name));
         }
     });
 

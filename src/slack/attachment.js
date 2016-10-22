@@ -1,7 +1,12 @@
-import { isHex, isUrl } from '../utils';
 import isTimestamp from 'validate.io-timestamp';
 
+import { isHex, isUrl } from '../utils';
+
 export default class Attachment {
+    constructor() {
+        this.color = '#000000';
+    }
+
     color(color) {
         if (!color || !isHex(color) || !this.isSlackAttachmentColor(color)) {
             console.warn(`Invalid color, ${color}, for Slack attachment. Setting default color`);
@@ -14,14 +19,18 @@ export default class Attachment {
     }
 
     author(author) {
-        if (author.name && !author.link || !isUrl(author.link)) {
-            console.warn(`Invalid author url, ${author.link}, for Slack attachment. Resetting...`);
-            author.link = undefined;
+        if (author.name && author.link) {
+            if (!isUrl(author.link)) {
+                console.warn(`Invalid author url, ${author.link}, for Slack attachment. Resetting...`);
+                author.link = undefined;
+            }
         }
 
-        if (author.name && !author.icon || !isUrl(author.icon) || !this.isCorrectSlackImageFormat(author.icon)) {
-            console.warn(`Invalid author icon url, ${author.icon}, for Slack attachment. Resetting...`);
-            author.icon = undefined;
+        if (author.name && author.icon) {
+            if (!isUrl(author.icon) || !this.isCorrectSlackImageFormat(author.icon)) {
+                console.warn(`Invalid author icon url, ${author.icon}, for Slack attachment. Resetting...`);
+                author.icon = undefined;
+            }
         }
 
         this.author_name = author.name;
@@ -31,15 +40,27 @@ export default class Attachment {
         return this;
     }
 
-    pretext(pretext) {
+    pretext(pretext, markdown = { use: false }) {
+        if (markdown.use && markdown.type) {
+            pretext = ''.concat(markdown.type, pretext, markdown.type);
+
+            if (!this.mrkdwn_in) {
+                this.mrkdwn_in = [];
+            }
+
+            this.mrkdwn_in.push(this.pretext.name);
+        }
+
         this.pretext = pretext;
         return this;
     }
 
     title(title) {
-        if (title.name && !title.link || !isUrl(title.link)) {
-            console.warn(`Invalid title url, ${title.link}, for Slack attachment. Resetting...`);
-            title.link = undefined;
+        if (title.name && title.link) {
+            if (!isUrl(title.link)) {
+                console.warn(`Invalid title url, ${title.link}, for Slack attachment. Resetting...`);
+                title.link = undefined;
+            }
         }
 
         this.title = title.name;
@@ -75,12 +96,30 @@ export default class Attachment {
         return this;
     }
 
-    field(field) {
+    field(field, markdown = { use: false }) {
         if (!this.fields) {
             this.fields = [];
         }
 
+        if (markdown.use && markdown.type) {
+            field.value = ''.concat(markdown.type, field.value, markdown.type);
+
+            if (!this.mrkdwn_in) {
+                this.mrkdwn_in = [];
+            }
+
+            this.mrkdwn_in.push('fields');
+        }
+
         this.fields.push(field);
+
+        return this;
+    }
+
+    flds(fields, markdown = { use: false }) {
+        fields.forEach((field) => {
+            this.field(field, markdown);
+        });
 
         return this;
     }

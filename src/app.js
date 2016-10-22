@@ -1,11 +1,9 @@
 import Express from 'express';
 import BodyParser from 'body-parser';
-import Comments from 'js-comments';
 
 import { SlashCommand } from './slack';
 import { mopidy, ServerEvents, CoreEvents } from './mopidy';
 import { cyclicObjectToJson } from './utils';
-
 
 let app = Express();
 let router = Express.Router();

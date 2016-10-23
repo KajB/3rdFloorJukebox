@@ -1,9 +1,5 @@
-import SlashCommand from './slash-command';
-import Response from './response';
-import FormattedResponse from './formatted-response';
-import ResponseType from './response-type';
-import Attachment from './attachment';
-import Field from './field';
-import MarkdownFormatting from './markdown-formatting';
+import SlashCommand, { Response, FormattedResponse, ResponseType } from './slash-command';
+import Attachment, { Field, MarkdownFormatting } from './attachment';
+import IncomingWebhook, { Message, FormattedMessage, OverrideOptions } from './incoming-webhook';
 
-export { SlashCommand, Response, FormattedResponse, ResponseType, Attachment, Field, MarkdownFormatting };
+export { SlashCommand, Response, FormattedResponse, ResponseType, Attachment, Field, MarkdownFormatting, IncomingWebhook, Message, FormattedMessage, OverrideOptions };

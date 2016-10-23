@@ -2,7 +2,7 @@ import Express from 'express';
 import BodyParser from 'body-parser';
 
 import { SlashCommand } from './slack';
-import { mopidy, ServerEvents, CoreEvents } from './mopidy';
+import { MopidyHandler, Events } from './mopidy';
 import { cyclicObjectToJson } from './utils';
 
 let app = Express();
@@ -18,16 +18,20 @@ router.use((req, res, next) => {
 
 router.route('/')
     .get((req, res) => {
-        res.json({ message: 'GET is OK!', mopidy: cyclicObjectToJson(mopidy) });
+        res.json({ message: 'GET is OK!', mopidy: cyclicObjectToJson(MopidyHandler._mopidy) });
     })
     .post((req, res) => {
         let slashCommand = new SlashCommand(req.body);
 
         let commandPromise = slashCommand.getResult();
 
-        commandPromise.done((commandResult) => {
-            res.status(commandResult.status).json(commandResult.data);
-        });
+        commandPromise.done(
+                        (commandResult) => {
+                            res.status(commandResult.status).json(commandResult.data);
+                        },
+                        (errorResult) => {
+                            res.status(400).json(errorResult);
+                        });
     });
 
 /**
@@ -37,31 +41,20 @@ app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: true }));
 app.use('/api', router);
 
-app.listen(process.env.port || 3030);
+app.listen(process.env.port || 3030, () => {
+    console.log('ready to serve!');
+
+    //MopidyHandler._mopidy.connect();
+});
 
 /**
- * Mopidy configuration
+ * Mopidy event configuration
  */
-let serverEvents = {
-    [ServerEvents.ONLINE]: () => {
-        console.log('Connection with mopidy server established');
-    },
-    [ServerEvents.OFFLINE]: () => {
-        console.log('Connection with mopidy server was broken');
-    },
-    [ServerEvents.RECONNECTION_PENDING]: () => {
-        console.log('Reconnection with mopidy server is pending...');
-    },
-    [ServerEvents.RECONNECTING]: () => {
-        console.log('Reconnecting with mopidy server...');
-    }
-};
+MopidyHandler._mopidy.bind({
+    [Events.ONLINE]: MopidyHandler.online,
+    [Events.OFFLINE]: MopidyHandler.offline,
+    [Events.RECONNECTION_PENDING]: MopidyHandler.reconnectionPending,
+    [Events.RECONNECTING]: MopidyHandler.reconnecting,
 
-let coreEvents = {
-    [CoreEvents.TRACKPLAYBACKSTARTED]: () => {
-        console.log('Connection with mopidy server established');
-    }
-};
-
-mopidy.bind(serverEvents);
-mopidy.bind(coreEvents);
+    [Events.TRACKPLAYBACKSTARTED]: MopidyHandler.trackPlaybackStarted
+});

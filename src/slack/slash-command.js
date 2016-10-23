@@ -1,9 +1,31 @@
 import Config from '../config';
 import Commands from '../commands';
-import { Mopidy } from '../mopidy';
+import { When as when } from '../mopidy';
+import { Enum }  from '../utils';
 
-import Response from './response';
-import FormattedResponse from './formatted-response';
+const ResponseType = Enum({
+    EPHEMERAL: 'ephemeral',
+    IN_CHANNEL: 'in_channel'
+});
+
+class Response {
+    constructor(statuscode, message) {
+        return {
+            status: statuscode,
+            data: message
+        };
+    }
+}
+
+class FormattedResponse extends Response {
+    constructor(text, attachments = [], type = ResponseType.EPHEMERAL) {
+        super(200, {
+            response_type: type,
+            text: text,
+            attachments: attachments
+        });
+    }
+}
 
 class SlashCommand {
     constructor(data) {
@@ -24,11 +46,11 @@ class SlashCommand {
 
     getResult() {
         if (this.isInvalid()) {
-            return Mopidy.when(new Response(400));
+            return when(new Response(400));
         }
 
         if (!Commands.has(this.command)) {
-            return Mopidy.when(new Response(200, 'That command is not known or currently implemented.'));
+            return when(new Response(200, 'That command is not known or currently implemented.'));
         }
 
         let command = this.needsHelp() ? Commands.get('help')
@@ -36,19 +58,9 @@ class SlashCommand {
         let commandParameters = this.needsHelp() ? Commands.get(this.command)
                                                  : this.commandParameters;
 
-        return command.run(commandParameters)
-            .then((commandResult) => {
-                return commandResult;
-            })
-            .catch((errorResult) => {
-                return new Response(400, errorResult);
-            });
+        return command.run(commandParameters);
     }
 
-    /// When your server receives the above data,
-    /// you should validate whether to service the request by confirming that the token value matches
-    /// the validation token you received from Slack when creating the command.
-    /// If the token or team are unknown to your application, you should refuse to service the request and return an error instead.
     isInvalid() {
         return !this.token || this.token !== Config.SLACK_TOKEN || !this.slackCommand || this.slackCommand !== Config.SLACK_COMMAND;
     }
@@ -58,4 +70,5 @@ class SlashCommand {
     }
 }
 
+export { Response, FormattedResponse, ResponseType };
 export default SlashCommand;

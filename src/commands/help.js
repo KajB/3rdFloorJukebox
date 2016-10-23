@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import Config from '../config';
-import { Mopidy } from '../mopidy';
+import { When as when } from '../mopidy';
 import { InternalCommand } from '../utils';
 import { FormattedResponse, Attachment, Field, MarkdownFormatting } from '../slack';
 
@@ -29,9 +29,9 @@ class Comment {
     }
 }
 
-export default class Help {
+class Help {
     constructor() {
-        // Mopidy.when.lift(FileSystem.readdirSync)(this.folder).then((files, err) => {
+        // when.lift(FileSystem.readdirSync)(this.folder).then((files, err) => {
         //     files.forEach(file => {
         //         console.log('lift', file);
         //     });
@@ -40,12 +40,12 @@ export default class Help {
 
     help(command) {
         if (!(command instanceof InternalCommand)) {
-            return Mopidy.when.reject('The given command is no instance of the Command class. A named command can only be executed when created as a internal command.');
+            return when.reject('The given command is no instance of the Command class. A named command can only be executed when created as a internal command.');
         }
 
         const helpFilenamePath = Config.DOCS_PATH + command.residesIn + Config.DOCS_EXTENSION;
 
-        return Mopidy.when.promise((resolve, reject) => {
+        return when.promise((resolve, reject) => {
             fs.readFile(helpFilenamePath, 'utf8', (err, file) => {
                 if (!err) resolve(Config.DOCS_PARSER.parse(file));
                 else reject(err);
@@ -57,9 +57,12 @@ export default class Help {
             let attachment = new Attachment().title({ name: 'parameters' })
                                              .pretext(comment.description, { use: true, type: MarkdownFormatting.ITALIC })
                                              .author({ name: `/${Config.SLACK_COMMAND} ${comment.methodName} (-h | --help)`})
-                                             .flds(comment.parameters.map((parameter) => new Field(parameter.name, parameter.type)));
+                                             .fields(comment.parameters.map((parameter) => new Field(parameter.name, parameter.type)))
+                                             .build();
 
             return new FormattedResponse(`Help for command: *${comment.methodName}*`, [attachment]);
         });
     }
 }
+
+export default Help;

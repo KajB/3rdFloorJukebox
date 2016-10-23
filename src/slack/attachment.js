@@ -1,10 +1,26 @@
 import isTimestamp from 'validate.io-timestamp';
 
-import { isHex, isUrl } from '../utils';
+import { Enum, isHex, isUrl } from '../utils';
 
-export default class Attachment {
+const MarkdownFormatting = Enum({
+    STRIKE: '~',
+    BOLD: '*',
+    ITALIC: '_',
+    CODE: '`',
+    PRE: '```'
+});
+
+class Field {
+    constructor(title, value, short = true) {
+        this.title = title;
+        this.value = value;
+        this.short = short;
+    }
+}
+
+class Attachment {
     constructor() {
-        this.color = '#000000';
+        this._color = '#000000';
     }
 
     color(color) {
@@ -13,7 +29,7 @@ export default class Attachment {
             color = '#000000';
         }
 
-        this.color = color;
+        this._color = color;
 
         return this;
     }
@@ -33,9 +49,9 @@ export default class Attachment {
             }
         }
 
-        this.author_name = author.name;
-        this.author_link = author.link;
-        this.author_icon = author.icon;
+        this._author_name = author.name;
+        this._author_link = author.link;
+        this._author_icon = author.icon;
 
         return this;
     }
@@ -44,14 +60,14 @@ export default class Attachment {
         if (markdown.use && markdown.type) {
             pretext = ''.concat(markdown.type, pretext, markdown.type);
 
-            if (!this.mrkdwn_in) {
-                this.mrkdwn_in = [];
+            if (!this._mrkdwn_in) {
+                this._mrkdwn_in = [];
             }
 
-            this.mrkdwn_in.push(this.pretext.name);
+            this._mrkdwn_in.push(this.pretext.name);
         }
 
-        this.pretext = pretext;
+        this._pretext = pretext;
         return this;
     }
 
@@ -63,14 +79,14 @@ export default class Attachment {
             }
         }
 
-        this.title = title.name;
-        this.title_link = title.link;
+        this._title = title.name;
+        this._title_link = title.link;
 
         return this;
     }
 
     text(text) {
-        this.text = text;
+        this._text = text;
         return this;
     }
 
@@ -80,7 +96,7 @@ export default class Attachment {
             url = undefined;
         }
 
-        this.image_url = url;
+        this._image_url = url;
 
         return this;
     }
@@ -91,32 +107,32 @@ export default class Attachment {
             url = undefined;
         }
 
-        this.thumb_url = url;
+        this._thumb_url = url;
 
         return this;
     }
 
     field(field, markdown = { use: false }) {
-        if (!this.fields) {
-            this.fields = [];
+        if (!this._fields) {
+            this._fields = [];
         }
 
         if (markdown.use && markdown.type) {
             field.value = ''.concat(markdown.type, field.value, markdown.type);
 
-            if (!this.mrkdwn_in) {
-                this.mrkdwn_in = [];
+            if (!this._mrkdwn_in) {
+                this._mrkdwn_in = [];
             }
 
-            this.mrkdwn_in.push('fields');
+            this._mrkdwn_in.push('fields');
         }
 
-        this.fields.push(field);
+        this._fields.push(field);
 
         return this;
     }
 
-    flds(fields, markdown = { use: false }) {
+    fields(fields, markdown = { use: false }) {
         fields.forEach((field) => {
             this.field(field, markdown);
         });
@@ -135,16 +151,37 @@ export default class Attachment {
             footer.ts = undefined;
         }
 
-        this.footer = footer.text;
-        this.footer_icon = footer.icon;
-        this.ts = footer.ts;
+        this._footer = footer.text;
+        this._footer_icon = footer.icon;
+        this._ts = footer.ts;
 
         return this;
     }
 
     fallback(fallback) {
-        this.fallback = fallback;
+        this._fallback = fallback;
         return this;
+    }
+
+    build() {
+        return {
+            color: this._color ? this._color : undefined,
+            fallback: this._fallback ? this._fallback : undefined,
+            footer: this._footer ? this._footer : undefined,
+            footer_icon: this._footer_icon ? this._footer_icon : undefined,
+            ts: this._ts ? this._ts : undefined,
+            fields: this._fields ? this._fields : undefined,
+            mrkdwn_in: this._mrkdwn_in ? this._mrkdwn_in : undefined,
+            thumb_url: this._thumb_url ? this._thumb_url : undefined,
+            image_url: this._image_url ? this._image_url : undefined,
+            text: this._text ? this._text : undefined,
+            title: this._title ? this._title : undefined,
+            title_link: this._title_link ? this._title_link : undefined,
+            pretext: this._pretext ? this._pretext : undefined,
+            author_name: this._author_name ? this._author_name : undefined,
+            author_link: this._author_link ? this._author_link : undefined,
+            author_icon: this._author_icon ? this._author_icon : undefined
+        };
     }
 
     isSlackAttachmentColor(color) {
@@ -155,3 +192,6 @@ export default class Attachment {
         return ['gif', 'jpeg', 'png', 'bmp'].some(slackImageFormat => slackImageFormat === url.split('.').pop());
     }
 }
+
+export { Field, MarkdownFormatting };
+export default Attachment;

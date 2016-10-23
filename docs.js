@@ -22,7 +22,7 @@ if (files.length > 0) {
 
 for (var i = 0; i < files.length; i++) {
     var comments = jscomments.parse(read(files[i]));
-    var log_file = fs.createWriteStream('./dist/' + files[i].split('.')[0] + '.json', { flags : 'w' });
+    var log_file = fs.createWriteStream(''.concat('./dist/', files[i].split('.')[0], '.json'), { flags : 'w' });
 
     log_file.write(util.format(comments) + '\n');
 }

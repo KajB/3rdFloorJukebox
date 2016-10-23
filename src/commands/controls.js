@@ -6,7 +6,7 @@ const VolumeType = Enum({
     DOWN: '-'
 });
 
-export default class Controls {
+class Controls {
     constructor() {
 
     }
@@ -38,3 +38,6 @@ export default class Controls {
         return Mopidy.when('Not yet implemented. Sorry!');
     }
 }
+
+export { VolumeType };
+export default Controls;

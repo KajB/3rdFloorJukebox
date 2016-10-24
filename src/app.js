@@ -1,8 +1,8 @@
 import Express from 'express';
 import BodyParser from 'body-parser';
 
-import { SlashCommand } from './slack';
 import { MopidyHandler, Events } from './mopidy';
+import { SlashCommand } from './slack';
 import { cyclicObjectToJson } from './utils';
 
 let app = Express();
@@ -27,9 +27,11 @@ router.route('/')
 
         commandPromise.done(
                         (commandResult) => {
+                            console.log('wat');
                             res.status(commandResult.status).json(commandResult.data);
                         },
                         (errorResult) => {
+                            console.log('wat1');
                             res.status(400).json(errorResult);
                         });
     });

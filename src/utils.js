@@ -58,3 +58,10 @@ export function isHex(str) {
 export function isUrl(str) {
     return new RegExp('@^(https?|ftp)://[^\s/$.?#].[^\s]*$@iS').test(str);
 }
+export function isIterable(obj) {
+    if (obj == null) {
+        return false;
+    }
+
+    return typeof obj[Symbol.iterator] === 'function';
+}

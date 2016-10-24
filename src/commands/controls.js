@@ -1,4 +1,5 @@
-import { Mopidy } from '../mopidy';
+import { When as when } from '../mopidy';
+import { Response } from '../slack';
 import { Enum } from '../utils';
 
 const VolumeType = Enum({
@@ -19,23 +20,23 @@ class Controls {
      * @return {Strings} to allow chaining
      */
     play() {
-        return Mopidy.when('Not yet implemented. Sorry!');
+        return when(new Response(200, 'Not yet implemented. Sorry!'));
     }
 
     /**
      * pause stuff
      */
     pause() {
-        return Mopidy.when('Not yet implemented. Sorry!');
+        return when(new Response(200, 'Not yet implemented. Sorry!'));
     }
 
     //
     mute() {
-        return Mopidy.when('Not yet implemented. Sorry!');
+        return when(new Response(200, 'Not yet implemented. Sorry!'));
     }
 
     volume() {
-        return Mopidy.when('Not yet implemented. Sorry!');
+        return when(new Response(200, 'Not yet implemented. Sorry!'));
     }
 }
 

@@ -2,8 +2,8 @@ import fs from 'fs';
 
 import Config from '../config';
 import { When as when } from '../mopidy';
-import { InternalCommand } from '../utils';
-import { FormattedResponse, Attachment, Field, MarkdownFormatting } from '../slack';
+import { InternalCommand, isIterable } from '../utils';
+import { Response, FormattedResponse, Attachment, Field, MarkdownFormatting } from '../slack';
 
 class Parameter {
     constructor(data) {
@@ -38,7 +38,24 @@ class Help {
         // });
     }
 
-    help(command) {
+    help(commands) {
+        let helpPromises = [...commands.values()].filter(command => command.method.name !== 'help' && command.method.name !== 'commandHelp')
+                                                 .map(command => commands.get('commandHelp').run(command));
+
+        when.all(helpPromises).then((formattedResponses) => {
+            return formattedResponses.filter(formattedResponse => formattedResponse.attachments.length > 0)
+                                                     .reduce((helpfulResponse) => {
+
+                                                     });
+            // let attachment = formattedResponse.data.attachments[0];
+            // let newAttachment = new Attachment().author({ name: `/${Config.SLACK_COMMAND} ${attachment.author_name} (-h | --help)`});
+            // return new FormattedResponse()
+        });
+
+        return when(new Response(200, 'yolo'));
+    }
+
+    commandHelp(command) {
         if (!(command instanceof InternalCommand)) {
             return when.reject('The given command is no instance of the Command class. A named command can only be executed when created as a internal command.');
         }
@@ -53,6 +70,10 @@ class Help {
         }).then((commentsData) => {
             let comments = commentsData.map((comment) => new Comment(comment));
             let comment = comments.find((comment) => comment.methodName === command.method.name);
+
+            if (!comment) {
+                return new FormattedResponse(`*${command.method.name}* can help itself!`);
+            }
 
             let attachment = new Attachment().title({ name: 'parameters' })
                                              .pretext(comment.description, { use: true, type: MarkdownFormatting.ITALIC })

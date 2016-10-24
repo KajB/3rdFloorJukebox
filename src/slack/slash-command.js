@@ -12,7 +12,7 @@ class Response {
     constructor(statuscode, message) {
         return {
             status: statuscode,
-            data: message
+            data: typeof message === 'string' || message instanceof String ? { text: message } : message
         };
     }
 }
@@ -40,8 +40,8 @@ class SlashCommand {
         this.text = data.text;
         this.responseUrl = data.response_url;
 
-        this.command = this.text.split(' ')[0];
-        this.commandParameters = this.text.split(' ').slice(1);
+        this.command = this.text ? this.text.split(' ')[0] : null;
+        this.commandParameters = this.text ? this.text.split(' ').slice(1) : null;
     }
 
     getResult() {
@@ -49,23 +49,37 @@ class SlashCommand {
             return when(new Response(400));
         }
 
-        if (!Commands.has(this.command)) {
+        if (this.criesForHelp()) {
+            return Commands.get('help')
+                           .run(Commands);
+        }
+
+        if (!this.isKnown()) {
             return when(new Response(200, 'That command is not known or currently implemented.'));
         }
 
-        let command = this.needsHelp() ? Commands.get('help')
-                                       : Commands.get(this.command);
-        let commandParameters = this.needsHelp() ? Commands.get(this.command)
-                                                 : this.commandParameters;
+        if (this.wantsSpecificHelp()) {
+            return Commands.get('commandHelp')
+                           .run(Commands.get(this.command));
+        }
 
-        return command.run(commandParameters);
+        return Commands.get(this.command)
+                       .run(this.commandParameters);
     }
 
     isInvalid() {
         return !this.token || this.token !== Config.SLACK_TOKEN || !this.slackCommand || this.slackCommand !== Config.SLACK_COMMAND;
     }
 
-    needsHelp() {
+    criesForHelp() {
+        return !this.command && !this.commandParameters || this.command === 'help';
+    }
+
+    isKnown() {
+        return Commands.has(this.command);
+    }
+
+    wantsSpecificHelp() {
         return (this.commandParameters.includes('-h') || this.commandParameters.includes('--help'));
     }
 }

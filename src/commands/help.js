@@ -2,8 +2,8 @@ import fs from 'fs';
 
 import Config from '../config';
 import { When as when } from '../mopidy';
-import { InternalCommand, isIterable } from '../utils';
-import { Response, FormattedResponse, Attachment, Field, MarkdownFormatting } from '../slack';
+import { InternalCommand, randomHex } from '../utils';
+import { FormattedResponse, Attachment, Field, MarkdownFormatting } from '../slack';
 
 class Parameter {
     constructor(data) {
@@ -42,17 +42,29 @@ class Help {
         let helpPromises = [...commands.values()].filter(command => command.method.name !== 'help' && command.method.name !== 'commandHelp')
                                                  .map(command => commands.get('commandHelp').run(command));
 
-        when.all(helpPromises).then((formattedResponses) => {
-            return formattedResponses.filter(formattedResponse => formattedResponse.attachments.length > 0)
-                                                     .reduce((helpfulResponse) => {
+        return when.all(helpPromises).then((formattedResponses) => {
+            return formattedResponses.map(formattedResponse => formattedResponse.data.attachments)
+                                     .filter(attachments => attachments.length > 0)
+                                     .reduce((a, b) => a.concat(b))
+                                     .map(attachment => {
+                                         return {
+                                             commandName: attachment.author_name,
+                                             description: attachment.pretext,
+                                             fields: [new Field(attachment.author_name, attachment.pretext, false)]
+                                         };
+                                     })
+                                     .reduce((p, c, i, a) => {
+                                         p.fields.push(new Field(c.commandName, c.description, false));
 
-                                                     });
-            // let attachment = formattedResponse.data.attachments[0];
-            // let newAttachment = new Attachment().author({ name: `/${Config.SLACK_COMMAND} ${attachment.author_name} (-h | --help)`});
-            // return new FormattedResponse()
+                                         if (i === (a.length - 1)) {
+                                             return new FormattedResponse(`Global help`, [new Attachment().fields(p.fields, { use: true })
+                                                                                                          .color(randomHex())
+                                                                                                          .build()]);
+                                         }
+
+                                         return p;
+                                     });
         });
-
-        return when(new Response(200, 'yolo'));
     }
 
     commandHelp(command) {

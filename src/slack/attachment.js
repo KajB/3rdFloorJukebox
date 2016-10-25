@@ -24,9 +24,11 @@ class Attachment {
     }
 
     color(color) {
-        if (!color || !isHex(color) || !this.isSlackAttachmentColor(color)) {
-            console.warn(`Invalid color, ${color}, for Slack attachment. Setting default color`);
-            color = '#000000';
+        if (!color || !isHex(color)) {
+            if (!this.isSlackAttachmentColor(color)) {
+                console.warn(`Invalid color, ${color}, for Slack attachment. Setting default color`);
+                color = '#000000';
+            }
         }
 
         this._color = color;
@@ -57,14 +59,18 @@ class Attachment {
     }
 
     pretext(pretext, markdown = { use: false }) {
-        if (markdown.use && markdown.type) {
-            pretext = ''.concat(markdown.type, pretext, markdown.type);
+        if (markdown.use) {
+            if (markdown.type) {
+                pretext = ''.concat(markdown.type, pretext, markdown.type);
+            }
 
             if (!this._mrkdwn_in) {
                 this._mrkdwn_in = [];
             }
 
-            this._mrkdwn_in.push(this.pretext.name);
+            if (!this._mrkdwn_in.includes(this.pretext.name)) {
+                this._mrkdwn_in.push(this.pretext.name);
+            }
         }
 
         this._pretext = pretext;
@@ -117,14 +123,18 @@ class Attachment {
             this._fields = [];
         }
 
-        if (markdown.use && markdown.type) {
-            field.value = ''.concat(markdown.type, field.value, markdown.type);
+        if (markdown.use) {
+            if (markdown.type) {
+                field.value = ''.concat(markdown.type, field.value, markdown.type);
+            }
 
             if (!this._mrkdwn_in) {
                 this._mrkdwn_in = [];
             }
 
-            this._mrkdwn_in.push('fields');
+            if (!this._mrkdwn_in.includes('fields')) {
+                this._mrkdwn_in.push('fields');
+            }
         }
 
         this._fields.push(field);

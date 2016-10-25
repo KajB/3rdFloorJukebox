@@ -13,28 +13,29 @@ class Controls {
     }
 
     /**
-     * Set a parser that can later be used to parse any given string.
-     *
-     * @param {String} `name`
-     * @param {Boolean} `yolo`
-     * @return {Strings} to allow chaining
+     * Play. As simple as that.
      */
     play() {
         return when(new Response(200, 'Not yet implemented. Sorry!'));
     }
 
     /**
-     * pause stuff
+     * Pause? Pause?!?! Yea. Pause that shit.
      */
     pause() {
         return when(new Response(200, 'Not yet implemented. Sorry!'));
     }
 
-    //
+    /**
+     * Pause? Pause?!?! Yea. Pause that shit.
+     */
     mute() {
         return when(new Response(200, 'Not yet implemented. Sorry!'));
     }
 
+    /**
+     * Pause? Pause?!?! Yea. Pause that shit...
+     */
     volume() {
         return when(new Response(200, 'Not yet implemented. Sorry!'));
     }

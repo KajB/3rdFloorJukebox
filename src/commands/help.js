@@ -31,11 +31,6 @@ class Comment {
 
 class Help {
     constructor() {
-        // when.lift(FileSystem.readdirSync)(this.folder).then((files, err) => {
-        //     files.forEach(file => {
-        //         console.log('lift', file);
-        //     });
-        // });
     }
 
     help(commands) {
@@ -57,9 +52,7 @@ class Help {
                                          p.fields.push(new Field(c.commandName, c.description, false));
 
                                          if (i === (a.length - 1)) {
-                                             return new FormattedResponse(`Global help`, [new Attachment().fields(p.fields, { use: true })
-                                                                                                          .color(randomHex())
-                                                                                                          .build()]);
+                                             return new FormattedResponse(`Global help`, Attachment.createMany(Math.ceil(p.fields.length / 10), p));
                                          }
 
                                          return p;

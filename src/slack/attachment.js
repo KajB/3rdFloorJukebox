@@ -1,6 +1,6 @@
 import isTimestamp from 'validate.io-timestamp';
 
-import { Enum, isHex, isUrl } from '../utils';
+import { Enum, isHex, isUrl, randomHex } from '../utils';
 
 const MarkdownFormatting = Enum({
     STRIKE: '~',
@@ -21,12 +21,13 @@ class Field {
 class Attachment {
     constructor() {
         this._color = '#000000';
+
     }
 
     color(color) {
         if (!color || !isHex(color)) {
             if (!this.isSlackAttachmentColor(color)) {
-                console.warn(`Invalid color, ${color}, for Slack attachment. Setting default color`);
+                console.warn(`Invalid or no color, ${color}, for Slack attachment. Setting default color`);
                 color = '#000000';
             }
         }
@@ -200,6 +201,16 @@ class Attachment {
 
     isCorrectSlackImageFormat(url) {
         return ['gif', 'jpeg', 'png', 'bmp'].some(slackImageFormat => slackImageFormat === url.split('.').pop());
+    }
+
+    static createMany(count, data) {
+        let attachments = [];
+        for (var i = 0; i < count; i++) {
+            attachments.push(new Attachment().fields(data.fields.slice(i * 10, 10), { use: true })
+                                             .color(randomHex())
+                                             .build());
+        }
+        return attachments;
     }
 }
 

@@ -2,17 +2,24 @@ import Mopidy from 'mopidy';
 
 import Config from '../config';
 import IncomingWebhook from '../slack';
-import CallingConvention from './calling-convention';
+import { Enum }  from '../utils';
 
-class MopidyHandler {
-    constructor() {
-        this._mopidy = new Mopidy({ webSocketUrl: `ws://${Config.MOPIDY_HOSTNAME}:${Config.MOPIDY_PORT}/mopidy/ws/`,
-                                    autoConnect: false,
-                                    callingConvention: CallingConvention.POSITION_OR_NAME,
-                                    backoffDelayMin: 5000,
-                                    backoffDelayMax: 320000 });
+const when = Mopidy.when;
+const callingConvention = Enum({
+    POSITION: 'by-position-only',
+    POSITION_OR_NAME: 'by-position-or-by-name'
+});
+const mopidy = new Mopidy({ webSocketUrl: `ws://${Config.MOPIDY_HOSTNAME}:${Config.MOPIDY_PORT}/mopidy/ws/`,
+                            autoConnect: false,
+                            callingConvention: callingConvention.POSITION_OR_NAME,
+                            backoffDelayMin: 5000,
+                            backoffDelayMax: 320000 });
 
-        this._mopidy.on(console.log.bind(console, 'INTERNAL LOGGING:'));
+class MopidyController {
+    constructor(mopidy) {
+        this.mopidy = mopidy;
+
+        this.mopidy.on(console.log.bind(console, 'INTERNAL LOGGING:'));
     }
 
     /**
@@ -98,4 +105,5 @@ class MopidyHandler {
     }
 }
 
-export default new MopidyHandler();
+export { mopidy as Mopidy, when as When, callingConvention as CallingConvention };
+export default new MopidyController(mopidy);

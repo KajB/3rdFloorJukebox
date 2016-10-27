@@ -1,8 +1,4 @@
-import Mopidy from 'mopidy';
-import MopidyHandler  from './instance';
-import CallingConvention from './calling-convention';
+import MopidyController, { Mopidy, When, CallingConvention } from './instance';
 import Events, { Prefixes } from './events';
 
-let when = Mopidy.when;
-
-export { Mopidy, when as When, MopidyHandler, CallingConvention, Prefixes, Events };
+export { MopidyController, Mopidy, When, CallingConvention, Prefixes, Events };

@@ -1,7 +1,7 @@
 import Express from 'express';
 import BodyParser from 'body-parser';
 
-import { MopidyHandler, Events } from './mopidy';
+import { MopidyController, Mopidy, Events as MopidyEvents } from './mopidy';
 import { SlashCommand } from './slack';
 import { cyclicObjectToJson } from './utils';
 
@@ -18,7 +18,7 @@ router.use((req, res, next) => {
 
 router.route('/')
     .get((req, res) => {
-        res.json({ message: 'GET is OK!', mopidy: cyclicObjectToJson(MopidyHandler._mopidy) });
+        res.json({ message: 'GET is OK!', mopidy: cyclicObjectToJson(Mopidy) });
     })
     .post((req, res) => {
         let slashCommand = new SlashCommand(req.body);
@@ -44,17 +44,17 @@ app.use('/api', router);
 app.listen(process.env.port || 3030, () => {
     console.log('ready to serve!');
 
-    //MopidyHandler._mopidy.connect();
+    //Mopidy.connect();
 });
 
 /**
  * Mopidy event configuration
  */
-MopidyHandler._mopidy.bind({
-    [Events.ONLINE]: MopidyHandler.online,
-    [Events.OFFLINE]: MopidyHandler.offline,
-    [Events.RECONNECTION_PENDING]: MopidyHandler.reconnectionPending,
-    [Events.RECONNECTING]: MopidyHandler.reconnecting,
+Mopidy.bind({
+    [MopidyEvents.ONLINE]: MopidyController.online,
+    [MopidyEvents.OFFLINE]: MopidyController.offline,
+    [MopidyEvents.RECONNECTION_PENDING]: MopidyController.reconnectionPending,
+    [MopidyEvents.RECONNECTING]: MopidyController.reconnecting,
 
-    [Events.TRACKPLAYBACKSTARTED]: MopidyHandler.trackPlaybackStarted
+    [MopidyEvents.TRACKPLAYBACKSTARTED]: MopidyController.trackPlaybackStarted
 });
